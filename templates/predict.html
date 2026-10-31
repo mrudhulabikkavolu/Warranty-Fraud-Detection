@@ -1,0 +1,534 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warranty Claim Prediction</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5fa;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #183b66;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            background: #183b66;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+        .issue-guide {
+            background: #eef4fb;
+            border-left: 4px solid #183b66;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            text-align: left;
+        }
+
+        .issue-guide h3 {
+            color: #183b66;
+            margin-top: 0;
+        }
+
+        .issue-guide p {
+            color: #444;
+            margin: 8px 0;
+        }
+        /* Improved form layout */
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 35px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 {
+            color: #183b66;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #26364a;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            margin-top: 5px;
+            border: 1px solid #ccd5e0;
+            border-radius: 7px;
+            font-size: 15px;
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        form > div {
+            margin-bottom: 20px;
+        }
+
+        .field-info {
+            color: #64748b;
+            font-size: 13px;
+            margin: 5px 0 10px;
+            line-height: 1.5;
+        }
+
+        .issue-guide {
+            margin: 22px 0;
+            padding: 18px;
+            border-radius: 9px;
+            background: #f1f6fc;
+            border-left: 4px solid #183b66;
+            grid-column: 1 / -1;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: #183b66;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background: #24558c;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+                margin: 20px auto;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Warranty Claim Prediction</h1>
+    <p>Enter the warranty claim details below.</p>
+
+    <form action="/predict" method="POST">
+
+        <div class="grid">
+
+            <div>
+                <label>Region</label>
+                <select name="Region" required>
+                    <option value="">Select Region</option>
+                    <option>East</option>
+                    <option>North</option>
+                    <option>North East</option>
+                    <option>North West</option>
+                    <option>South</option>
+                    <option>South East</option>
+                    <option>South West</option>
+                    <option>West</option>
+                </select>
+            </div>
+
+            <div>
+                    <label for="state">State</label>
+                    <select name="State" id="state" required>
+                        <option value="">Select State</option>
+                        {% for state in [
+                            'Andhra Pradesh', 'Assam', 'Bihar', 'Delhi', 'Goa',
+                            'Gujarat', 'Himachal Pradesh', 'Jammu and Kashmir',
+                            'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
+                            'Maharashtra', 'Orissa', 'Rajasthan', 'Tamil Nadu',
+                            'Tripura', 'Uttar Pradesh', 'West Bengal'
+                        ] %}
+                        <option value="{{ state }}">{{ state }}</option>
+                        {% endfor %}
+                    </select>
+            </div>
+
+            <div>
+                <label>Area</label>
+                <select name="Area" required>
+                    <option value="">Select Area</option>
+                    <option>Rural</option>
+                    <option>Urban</option>
+                </select>
+            </div>
+
+            <div>
+                    <label for="city">City</label>
+                    <select name="City" id="city" required disabled>
+                        <option value="">Select State First</option>
+                    </select>
+            </div>
+
+            <div>
+                <label>Consumer Profile</label>
+                <select name="Consumer_profile" required>
+                    <option value="">Select Profile</option>
+                    <option>Business</option>
+                    <option>Personal</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="product_category">Product Category</label>
+
+                <select id="product_category" disabled>
+                    <option value="">Select Product Type First</option>
+                    <option value="Household">Household</option>
+                    <option value="Entertainment">Entertainment</option>
+                </select>
+
+                <input
+                    type="hidden"
+                    name="Product_category"
+                    id="category_value"
+                >
+
+                <p class="field-info">
+                    Automatically selected based on the product type.
+                </p>
+            </div>
+
+            <div>
+                <label>Product Type</label>
+                <select name="Product_type" id="product_type" required>
+                    <option value="">Select Product</option>
+                    <option>AC</option>
+                    <option>TV</option>
+                </select>
+            </div>
+
+            <div class="issue-guide">
+            <h3>Understanding Issue Codes</h3>
+
+            <p>
+                <strong>0 - No Issue:</strong>
+                The component has no reported issue.
+            </p>
+
+            <p>
+                <strong>1 - Repair:</strong>
+                The component requires repair.
+            </p>
+
+            <p>
+                <strong>2 - Replacement:</strong>
+                The component requires replacement.
+            </p>
+        </div>
+            
+        <!-- AC Issues -->
+        <div id="ac_issues" style="display: none;">
+
+            <h3>Air Conditioner (AC) Issue Details</h3>
+            <p>Select the condition of each AC component.</p>
+
+            {% for field, label in [
+                ('AC_1001_Issue', 'AC Compressor'),
+                ('AC_1002_Issue', 'AC Condenser Coil'),
+                ('AC_1003_Issue', 'AC Evaporator Coil')
+            ] %}
+
+            <div>
+                <label>{{ label }}</label>
+                <select name="{{ field }}">
+                    <option value="0">0 - No Issue</option>
+                    <option value="1">1 - Repair</option>
+                    <option value="2">2 - Replacement</option>
+                </select>
+            </div>
+
+            {% endfor %}
+        </div>
+
+
+        <!-- TV Issues -->
+        <div id="tv_issues" style="display: none;">
+
+            <h3>Television (TV) Issue Details</h3>
+            <p>Select the condition of each TV component.</p>
+
+            {% for field, label in [
+                ('TV_2001_Issue', 'TV Power Supply'),
+                ('TV_2002_Issue', 'TV Inverter'),
+                ('TV_2003_Issue', 'TV Motherboard')
+            ] %}
+
+            <div>
+                <label>{{ label }}</label>
+                <select name="{{ field }}">
+                    <option value="0">0 - No Issue</option>
+                    <option value="1">1 - Repair</option>
+                    <option value="2">2 - Replacement</option>
+                </select>
+            </div>
+
+            {% endfor %}
+        </div>
+
+
+        </div>
+
+            <div>
+                <label for="claim_value">Claim Value (₹)</label>
+
+            <p class="field-info">
+                Enter the monetary amount requested by the customer
+                under the warranty claim.
+            </p>
+
+            <input
+                type="number"
+                id="claim_value"
+                name="Claim_Value"
+                placeholder="Example: 5000"
+                min="0"
+                step="0.01"
+                required
+            >
+            </div>
+
+            <div>
+                <label for="product_age">Product Age</label>
+
+            <p class="field-info">
+                Enter the age of the product in days, as recorded in the dataset.
+            </p>
+
+            <input
+                type="number"
+                id="product_age"
+                name="Product_Age"
+                placeholder="Example: 365"
+                min="0"
+                required
+            >
+            </div>
+
+            <div>
+                <label for="service_centre">Service Centre</label>
+
+                <p class="field-info">
+                    Select the service centre ID associated with the warranty claim.
+                </p>
+
+                <select name="Service_Centre" id="service_centre" required>
+                    <option value="">Select Service Centre</option>
+                    {% for i in range(10, 17) %}
+                        <option value="{{ i }}">Service Centre {{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label>Purchased From</label>
+                <select name="Purchased_from" required>
+                    <option value="">Select Source</option>
+                    <option>Dealer</option>
+                    <option>Internet</option>
+                    <option>Manufacturer</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="call_details">Call Details</label>
+
+            <p class="field-info">
+                Enter the call details value recorded for the customer's
+                warranty claim.
+            </p>
+
+            <input
+                type="number"
+                id="call_details"
+                name="Call_details"
+                placeholder="Enter call details value"
+                min="0"
+                step="0.1"
+                required
+            >
+            </div>
+
+            <div>
+                <label>Purpose</label>
+                <select name="Purpose" required>
+                    <option value="">Select Purpose</option>
+                    <option>Claim</option>
+                    <option>Complaint</option>
+                    <option>Other</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit">Predict Warranty Claim</button>
+
+    </form>
+
+</div>
+<script>
+    const productType = document.getElementById("product_type");
+
+    const acIssues = document.getElementById("ac_issues");
+    const tvIssues = document.getElementById("tv_issues");
+
+    function showProductIssues() {
+
+        if (productType.value === "AC") {
+            acIssues.style.display = "block";
+            tvIssues.style.display = "none";
+
+        } else if (productType.value === "TV") {
+            acIssues.style.display = "none";
+            tvIssues.style.display = "block";
+
+        } else {
+            acIssues.style.display = "none";
+            tvIssues.style.display = "none";
+        }
+    }
+
+    const categoryDropdown =
+    document.getElementById("product_category");
+
+    const categoryValue =
+        document.getElementById("category_value");
+
+    function updateProductDetails() {
+
+        showProductIssues();
+
+        if (productType.value === "AC") {
+            categoryDropdown.value = "Household";
+            categoryValue.value = "Household";
+
+        } else if (productType.value === "TV") {
+            categoryDropdown.value = "Entertainment";
+            categoryValue.value = "Entertainment";
+
+        } else {
+            categoryDropdown.value = "";
+            categoryValue.value = "";
+        }
+    }
+
+    productType.addEventListener("change", updateProductDetails);
+
+    updateProductDetails();
+
+    
+</script>
+<script>
+const stateCityMap = {
+    "Andhra Pradesh": ["Vijayawada", "Vizag"],
+    "Assam": ["Guwhati"],
+    "Bihar": ["Patna", "Purnea"],
+    "Delhi": ["Delhi", "NewDelhi"],
+    "Goa": ["Panaji"],
+    "Gujarat": ["Ahmedabad", "Vadodara"],
+    "Himachal Pradesh": ["Shimla"],
+    "Jammu and Kashmir": ["Srinagar"],
+    "Jharkhand": ["Ranchi"],
+    "Karnataka": ["Bangalore"],
+    "Kerala": ["Kochi"],
+    "Madhya Pradesh": ["Bhopal"],
+    "Maharashtra": ["Mumbai", "Pune"],
+    "Orissa": ["Bhubaneswar"],
+    "Rajasthan": ["Jaipur"],
+    "Tamil Nadu": ["Chennai"],
+    "Tripura": ["Agartala"],
+    "Uttar Pradesh": ["Lucknow", "Meerut"],
+    "West Bengal": ["Kolkata"]
+};
+
+const stateDropdown = document.getElementById("state");
+const cityDropdown = document.getElementById("city");
+
+stateDropdown.addEventListener("change", function () {
+    const selectedState = this.value;
+    const cities = stateCityMap[selectedState] || [];
+
+    cityDropdown.innerHTML =
+        '<option value="">Select City</option>';
+
+    cities.forEach(function (city) {
+        const option = document.createElement("option");
+        option.value = city;
+        option.textContent = city;
+        cityDropdown.appendChild(option);
+    });
+
+    cityDropdown.disabled = cities.length === 0;
+});
+</script>
+</body>
+</html>
